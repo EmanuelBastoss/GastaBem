@@ -1,24 +1,27 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-
-const Gasto = sequelize.define('Gasto', {
-  descricao: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  valor: {
-    type: DataTypes.FLOAT,
-    allowNull: false
-  },
-  categoria: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  data: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Gasto extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
   }
-});
-
-module.exports = Gasto;
+  Gasto.init({
+    descricao: DataTypes.STRING,
+    valor: DataTypes.DECIMAL,
+    categoria: DataTypes.STRING,
+    data: DataTypes.DATE,
+    userId: DataTypes.INTEGER
+  }, {
+    sequelize,
+    modelName: 'Gasto',
+  });
+  return Gasto;
+};

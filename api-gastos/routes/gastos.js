@@ -1,53 +1,33 @@
-require('dotenv').config();
-
+// routes/gastos.js
 const express = require('express');
-const cors = require('cors');
-const sequelize = require('./config/database.js');
-const Gasto = require('./models/gasto');
+const router = express.Router();
+const { Gasto } = require('../models');
+const auth = require('../../auth-api/middleware/auth'); // Certifique-se de ter o middleware de autenticação
 
-
-const app = express();
-const port = 3000;
-
-
-app.use(cors());
-
-
-
-app.use(express.json());
-
-
-app.get('/', (req, res) => {
-  res.send('Bem-vindo à API Gasta Bem!');
-});
-
-sequelize.sync()
-  .then(() => {
-    console.log('Conectado com sucesso ao banco de dados!');
-  })
-  .catch((err) => {
-    console.error('Erro: Falha ao conectar com o banco de dados:', err);
-  });
-
-
-app.get('/api/gastos', async (req, res) => {
+// Rota para obter todos os gastos
+router.get('/', auth, async (req, res) => {
   try {
-    const gastos = await Gasto.findAll();
-    res.json(gastos);
+      const gastos = await Gasto.findAll();
+      console.log("Gastos encontrados:", gastos); // Adicione esta linha
+      res.json(gastos);
   } catch (err) {
-    res.status(500).json({ error: 'Erro ao buscar dados' });
+      console.error("Erro ao buscar gastos:", err); // E esta também
+      res.status(500).json({ error: 'Erro ao buscar dados' });
   }
 });
 
 
-app.post('/api/gastos', async (req, res) => {
+// Rota para criar um novo gasto
+router.post('/', auth, async (req, res) => {
   try {
     const { descricao, valor, categoria } = req.body;
+    const userId = req.user.id; // Obtém o userId do token JWT
     const novoGasto = await Gasto.create({ 
       descricao, 
       valor, 
       categoria,
-      data: new Date()
+      data: new Date(),
+      userId
     });
     res.status(201).json(novoGasto);
   } catch (err) {
@@ -55,9 +35,8 @@ app.post('/api/gastos', async (req, res) => {
   }
 });
 
-
-
-app.put('/api/gastos/:id', async (req, res) => {
+// Rota para atualizar um gasto
+router.put('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const { descricao, valor, categoria } = req.body;
@@ -75,8 +54,8 @@ app.put('/api/gastos/:id', async (req, res) => {
   }
 });
 
-
-app.delete('/api/gastos/:id', async (req, res) => {
+// Rota para deletar um gasto
+router.delete('/:id', auth, async (req, res) => {
   try {
     const { id } = req.params;
     const gasto = await Gasto.findByPk(id);
@@ -90,9 +69,4 @@ app.delete('/api/gastos/:id', async (req, res) => {
   }
 });
 
-
-app.listen(port, () => {
-  console.log(`API rodando na porta ${port}`);
-});
-
-
+module.exports = router;

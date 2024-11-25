@@ -1,224 +1,235 @@
-<!DOCTYPE html>
-<html lang="pt-br">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GastaBem - Despesas</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GastaBem</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .categoria-badge {
-            font-size: 0.8em;
-            padding: 5px 10px;
-        }
-        .valor {
-            font-weight: bold;
-            color: #dc3545;
-        }
-        .btn-group .btn-primary {
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-            color: #6c757d;
-        }
-
-        .btn-group .btn-primary:hover {
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-            color: #495057;
-        }
-
-        .btn-group .btn-primary.active {
-            background-color: #e9ecef;
-            border-color: #dee2e6;
-            color: #495057;
-            box-shadow: none;
-        }
-
-        .btn-group .btn-primary:focus {
-            box-shadow: none;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <div class="logo" style="display: flex; justify-content: center; align-items: center; font-size: 24px;">
-                <i class="fas fa-dollar-sign" id="logo" style="margin-right: 8px;"></i>
-                <b class="textlogo" id="textlogo" style="font-family: Arial, sans-serif;">GastaBem</b>
-            </div>
-            <div class="btn-group" style="margin-left: 50px;">
-                <a href="index.html" class="btn btn-primary active" aria-current="page">Home</a>
-                <a href="pages/despesas.html" class="btn btn-primary">Despesas</a>
-            </div>
-            <div class="ms-auto d-flex align-items-center">
-                <span id="welcome-text" style="color: #666; font-size: 0.85rem; margin-right: 15px;"></span>
-                <button id="logoutBtn" class="btn btn-outline-danger btn-sm">
-                    <i class="fas fa-sign-out-alt"></i> Sair
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container my-4">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3" onclick="navegarPara('saldo.html')" style="cursor: pointer;">
-                    <div class="card-header">Saldo Atual</div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="saldo-atual">Carregando...</h5>
-                        <p class="card-text">Seu saldo disponível.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-danger mb-3" onclick="navegarPara('src/pages/despesas.html')" style="cursor: pointer;">
-                    <div class="card-header">Despesas</div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="despesas">Carregando...</h5>
-                        <p class="card-text">Total de despesas neste mês.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success mb-3" onclick="navegarPara('src/pages/planejamento.html')" style="cursor: pointer;">
-                    <div class="card-header">Planejamento</div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="planejamento">Carregando...</h5>
-                        <p class="card-text">Meta de gastos planejada.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Dashboards -->
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-3">
-                    <div class="card-header">Despesas do Mês</div>
-                    <div class="card-body">
-                        <canvas id="despesasMesChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-3">
-                    <div class="card-header">Despesas por Categoria</div>
-                    <div class="card-body">
-                        <canvas id="despesasCategoriaChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('userToken');
-            const appName = document.getElementById('textlogo');
-            
-            if (token) {
-                try {
-                    const decodedToken = JSON.parse(atob(token.split('.')[1]));
-                    console.log('Token Decodificado:', decodedToken);
-                    // Usando o nome do token, com fallback para email se o nome não existir
-                    const displayName = decodedToken.name || decodedToken.email.split('@')[0];
-                    appName.innerHTML = `GastaBem - Bem-vindo, ${displayName}!`;
-                    
-                } catch (error) {
-                    console.error('Erro ao decodificar token:', error);
-                    appName.innerHTML = 'GastaBem';
-                }
-            } else {
-                window.location.href = 'pages/login.html';
-            }
-        });
-    </script>
-    <!-- Import Bootstrap and Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" integrity="sha512-NmLkDIU1C/C88wi324HBc+S2kLhi08PN5GDeUVVVC/BVt/9Izdsc9SVeVfA1UZbY3sHUlDSyRXhCzHfr6hmPPw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="css/styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Exemplo de dados para os gráficos
-        const despesasMesCtx = document.getElementById('despesasMesChart').getContext('2d');
-        const despesasMesChart = new Chart(despesasMesCtx, {
-            type: 'line',
-            data: {
-                labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio'],
-                datasets: [{
-                    label: 'Despesas do Mês',
-                    data: [1200, 1900, 3000, 500, 2000],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-        });
-    
-        const despesasCategoriaCtx = document.getElementById('despesasCategoriaChart').getContext('2d');
-        const despesasCategoriaChart = new Chart(despesasCategoriaCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Alimentação', 'Transporte', 'Lazer', 'Educação', 'Outros'],
-                datasets: [{
-                    label: 'Despesas por Categoria',
-                    data: [500, 300, 100, 400, 700],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const token = localStorage.getItem('userToken');
-            const appName = document.getElementById('textlogo');
-            const welcomeText = document.getElementById('welcome-text');
-            const logoutBtn = document.getElementById('logoutBtn');
-            
-            if (token) {
-                try {
-                    const decodedToken = JSON.parse(atob(token.split('.')[1]));
-                    const displayName = decodedToken.name || decodedToken.email.split('@')[0];
-                    
-                    appName.textContent = 'GastaBem';
-                    welcomeText.textContent = `Bem-vindo, ${displayName}`;
-                    console.log(token)
-                    
-                    // Adiciona o evento de logout
-                    logoutBtn.addEventListener('click', function() {
-                        localStorage.removeItem('userToken');
-                        window.location.href = '/pages/login.html';
-                    });
-                    
-                } catch (error) {
-                    console.error('Erro ao decodificar token:', error);
-                    appName.textContent = 'GastaBem';
+
+</head>
+  <body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="logo" style="display: flex; justify-content: center; align-items: center; font-size: 24px;">
+            <i class="fas fa-dollar-sign" id="logo"></i>
+            <b class="textlogo" id="textlogo">GastaBem</b>
+        </div>
+        <div class="ms-auto d-flex align-items-center">
+            <span id="welcome-text" style="color: #666; font-size: 0.85rem; margin-right: 15px;"></span>
+            <button id="logoutBtn" class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </div>
+</nav>
+<!-- Cards de Saldo Atual, Despesas e Planejamento -->
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3" onclick="navegarPara('saldo.html')" style="cursor: pointer;">
+                <div class="card-header">Saldo Atual</div>
+                <div class="card-body">
+                    <h5 class="card-title" id="saldo-atual">Carregando...</h5>
+                    <p class="card-text">Seu saldo disponível.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3" onclick="navegarPara('src/pages/despesas.html')" style="cursor: pointer;">
+                <div class="card-header">Despesas</div>
+                <div class="card-body">
+                    <h5 class="card-title" id="despesas">Carregando...</h5>
+                    <p class="card-text">Total de despesas neste mês.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3" onclick="navegarPara('src/pages/planejamento.html')" style="cursor: pointer;">
+                <div class="card-header">Planejamento</div>
+                <div class="card-body">
+                    <h5 class="card-title" id="planejamento">Carregando...</h5>
+                    <p class="card-text">Meta de gastos planejada.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboards -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">Despesas do Mês</div>
+                <div class="card-body">
+                    <canvas id="despesasMesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-3">
+                <div class="card-header">Despesas por Categoria</div>
+                <div class="card-body">
+                    <canvas id="despesasCategoriaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const apiUrl = 'http://localhost:5012/api/gastos'; // Porta correta da sua API
+
+    // Função para formatar data
+    function formatarData(data) {
+        return new Date(data).toLocaleDateString();
+    }
+
+    async function carregarDados() {
+        const token = localStorage.getItem('userToken');
+        if (!token) {
+            window.location.href = '/pages/login.html';
+            return;
+        }
+
+        try {
+            const responseResumo = await fetch(`${apiUrl}/resumo`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            } else {
-                window.location.href = '/pages/login.html';
+            });
+
+            if (!responseResumo.ok) {
+                throw new Error(`Erro ao buscar resumo: ${responseResumo.status} ${responseResumo.statusText}`);
             }
+
+            const resumo = await responseResumo.json();
+
+            document.getElementById('saldo-atual').textContent = `R$ ${resumo.saldoAtual || 0}`;
+            document.getElementById('despesas').textContent = `R$ ${resumo.totalDespesas.toFixed(2)}`;
+            document.getElementById('planejamento').textContent = `R$ ${resumo.planejamento || 0}`;
+
+            atualizarGraficoDespesasCategoria(resumo.gastosPorCategoria);
+
+            const responseGastos = await fetch(apiUrl, {  // Buscar os gastos individuais
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!responseGastos.ok) {
+                throw new Error(`Erro ao buscar gastos: ${responseGastos.status} ${responseGastos.statusText}`);
+            }
+
+            const gastos = await responseGastos.json();
+            atualizarGraficoDespesasMes(gastos);
+
+        } catch (error) {
+            console.error('Erro ao carregar dados:', error);
+            // Lógica para lidar com o erro, talvez exibir uma mensagem para o usuário
+        }
+    }
+
+
+    function atualizarGraficoDespesasCategoria(gastosPorCategoria) {
+        const categorias = Object.keys(gastosPorCategoria);
+        const valores = Object.values(gastosPorCategoria);
+
+        despesasCategoriaChart.data.labels = categorias;
+        despesasCategoriaChart.data.datasets[0].data = valores;
+        despesasCategoriaChart.update();
+    }
+
+    function atualizarGraficoDespesasMes(gastos) {
+        const gastosPorMes = {};
+        gastos.forEach(gasto => {
+            const mes = formatarData(gasto.data).slice(3); // Extrair mês e ano (ex: "01/2024" -> "01/2024")
+            gastosPorMes[mes] = (gastosPorMes[mes] || 0) + Number(gasto.valor);
         });
-    </script>
-    
-    <script type="module" src="js/scripts.js"></script>
+
+        const labels = Object.keys(gastosPorMes);
+        const data = Object.values(gastosPorMes);
+
+        despesasMesChart.data.labels = labels;
+        despesasMesChart.data.datasets[0].data = data;
+        despesasMesChart.update();
+    }
+
+<!-- script para a pagina saber que o usuario esta logado -->
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const token = localStorage.getItem('userToken');
+        const appName = document.getElementById('textlogo');
+        const welcomeText = document.getElementById('welcome-text');
+        const logoutBtn = document.getElementById('logoutBtn');
+        
+        //ve se o token do login é valido e puxa os dados do usuario para pagina
+        if (token) {
+            try {
+                const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                const displayName = decodedToken.name || decodedToken.email.split('@')[0];
+                
+                appName.textContent = 'GastaBem';
+                welcomeText.textContent = `Bem-vindo, ${displayName}`;
+                console.log(token)
+                
+                // Botão para fazer logout do site
+                logoutBtn.addEventListener('click', function() {
+                    localStorage.removeItem('userToken');
+                    window.location.href = '/pages/login.html';
+                });
+                
+            } catch (error) {
+                console.error('Erro ao decodificar token:', error);
+                appName.textContent = 'GastaBem';
+            }
+            //se o token não for valido ele envia pra pagina de login
+        } else { 
+            window.location.href = '/pages/login.html';
+        }
+    });
+    document.addEventListener('DOMContentLoaded', carregarDados); // Carregar dados ao carregar a página
+</script>
+<script>
+    // Inicialização dos gráficos (fora do carregamento da página)
+    const despesasMesCtx = document.getElementById('despesasMesChart').getContext('2d');
+    const despesasMesChart = new Chart(despesasMesCtx, {
+        type: 'line',
+        data: {
+            labels: [], // Inicialmente vazio
+            datasets: [{
+                label: 'Despesas do Mês',
+                data: [], // Inicialmente vazio
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+    });
+
+    const despesasCategoriaCtx = document.getElementById('despesasCategoriaChart').getContext('2d');
+    const despesasCategoriaChart = new Chart(despesasCategoriaCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [], // Inicialmente vazio
+            datasets: [{
+                label: 'Despesas por Categoria',
+                data: [], // Inicialmente vazio
+                backgroundColor: [ /* ... cores ... */ ],
+                borderColor: [ /* ... cores ... */ ],
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
+
+
+<script src="js/scripts.js"></script>
 </body>
-    </html>
-    
+
+</html>
