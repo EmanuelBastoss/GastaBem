@@ -1,37 +1,36 @@
-// routes/gastos.js
 const express = require('express');
-const router = express.Router();
 const { Gasto } = require('../models');
-const auth = require('../../auth-api/middleware/auth'); // Certifique-se de ter o middleware de autenticação
+const authMiddleware = require('../../auth-api/middleware/auth');
 
-// Rota para obter todos os gastos
-router.get('/', auth, async (req, res) => {
+const router = express.Router();
+
+router.use(authMiddleware);
+
+// Criar um novo gasto
+router.post('/', async (req, res) => {
   try {
-      const gastos = await Gasto.findAll();
-      console.log("Gastos encontrados:", gastos); // Adicione esta linha
-      res.json(gastos);
-  } catch (err) {
-      console.error("Erro ao buscar gastos:", err); // E esta também
-      res.status(500).json({ error: 'Erro ao buscar dados' });
+    const { descricao, valor, data } = req.body;
+    const gasto = await Gasto.create({
+      descricao,
+      valor,
+      data,
+      userId: req.user.id // Usa o ID do usuário do token
+    });
+    res.status(201).json(gasto);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
-
-// Rota para criar um novo gasto
-router.post('/', auth, async (req, res) => {
+// Listar gastos do usuário
+router.get('/', async (req, res) => {
   try {
-    const { descricao, valor, categoria } = req.body;
-    const userId = req.user.id; // Obtém o userId do token JWT
-    const novoGasto = await Gasto.create({ 
-      descricao, 
-      valor, 
-      categoria,
-      data: new Date(),
-      userId
+    const gastos = await Gasto.findAll({
+      where: { userId: req.user.id } // Filtra por usuário
     });
-    res.status(201).json(novoGasto);
-  } catch (err) {
-    res.status(500).json({ error: 'Erro ao adicionar dados' });
+    res.json(gastos);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -66,6 +65,21 @@ router.delete('/:id', auth, async (req, res) => {
     res.json({ message: 'Dado removido com sucesso' });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao remover o dado' });
+  }
+});
+
+router.get('/resumo', auth, async (req, res) => {
+  try {
+    const gastos = await Gasto.findAll({ where: { userId: req.user.id } });
+    const totalDespesas = gastos.reduce((sum, gasto) => sum + Number(gasto.valor), 0);
+    const gastosPorCategoria = gastos.reduce((acc, gasto) => {
+      acc[gasto.categoria] = (acc[gasto.categoria] || 0) + Number(gasto.valor);
+      return acc;
+    }, {});
+
+    res.json({ totalDespesas, gastosPorCategoria });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao obter resumo dos gastos' });
   }
 });
 

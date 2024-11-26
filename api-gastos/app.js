@@ -14,15 +14,15 @@ app.use('/api/entradas', entradasRoutes);
 app.use('/api/gastos', gastosRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Bem-vindo à API Gasta Bem!');
+    res.send('Bem-vindo à API Gasta Bem!');
 });
-
 
 // Sincroniza os modelos com o banco de dados e inicia o servidor
 async function startServer() {
     try {
         await db.sequelize.authenticate(); // Testa a conexão antes da sincronização
         console.log('Conexão com o banco de dados estabelecida com sucesso.');
+        console.log('Configurações do banco de dados:', db.sequelize.config); // Exibe as configurações
 
         await db.sequelize.sync();
         console.log('Modelos sincronizados com o banco de dados.');

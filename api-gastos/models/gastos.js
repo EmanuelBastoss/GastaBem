@@ -1,36 +1,24 @@
-// models/gasto.js
-'use strict';
-
+// api-gastos/src/models/gastos.js
 module.exports = (sequelize, DataTypes) => {
   const Gasto = sequelize.define('Gasto', {
-    descricao: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    valor: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false
-    },
-    categoria: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    data: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      defaultValue: DataTypes.NOW
-    },
+    descricao: DataTypes.STRING,
+    valor: DataTypes.DECIMAL(10, 2),
+    data: DataTypes.DATE,
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
+      references: {
+        model: 'Users',
+        key: 'id'
+      },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE' 
     }
-  }, {
-    timestamps: true
   });
-  
-  Gasto.associate = function(models) {
-    Gasto.belongsTo(models.User, { foreignKey: 'userId' });
+
+  Gasto.associate = function (models) {
+    Gasto.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
   };
-  
+
   return Gasto;
 };

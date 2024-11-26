@@ -53,7 +53,6 @@
         
 
     <script>
-        
         const erroSenha = document.getElementById('erro-senha');
         
         document.getElementById('login-form').addEventListener('submit', async function(e) {
@@ -64,28 +63,26 @@
             const password = document.getElementById('senha').value;
     
             try {
-                const response = await fetch('http://localhost:5001/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
+                const response = await axios.post('http://localhost:5001/login', {
+                    email,
+                    password
                 });
     
-                const data = await response.json();
-    
-                if (response.ok) {
-                    console.log('Login bem-sucedido! Token: ' + data.token);
-                    localStorage.setItem('userToken', data.token);
+                if (response.status === 200) {
+                    console.log('Login bem-sucedido! Token: ' + response.data.token);
+                    localStorage.setItem('userToken', response.data.token);
                     window.location.href = "../index.html";
-                } else {
-                    console.log('Erro: ' + data.error);
-                    erroSenha.textContent = 'Email ou Senha incorretos!';
                 }
             } catch (error) {
-                erroSenha.textContent = 'Erro ao conectar com o servidor';
+                if (error.response && error.response.status === 401) {
+                    erroSenha.textContent = 'Email ou Senha incorretos!';
+                } else {
+                    erroSenha.textContent = 'Erro ao conectar com o servidor';
+                }
             }
         });
     </script>
+    <div id="root"></div> {/* O React renderizará aqui */}
+    <script src="bundle.js"></script> {/* Seu bundle React */}
 </body>
 </html>

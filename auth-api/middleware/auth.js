@@ -1,21 +1,19 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
-    const authHeader = req.header('Authorization'); // Obtenha o cabeçalho
+    const authHeader = req.header('Authorization');
 
-    // Verifique se o cabeçalho existe ANTES de chamar replace
-    if (!authHeader || !authHeader.startsWith('Bearer ')) { 
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ message: 'Acesso negado. Token não fornecido ou inválido.' });
     }
 
-    const token = authHeader.replace('Bearer ', ''); // Agora é seguro chamar replace
+    const token = authHeader.replace('Bearer ', '');
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
+        req.user = decoded; // Certifique-se de que o token contém o userId
         next();
     } catch (err) {
         res.status(400).json({ message: 'Token inválido.' });
     }
 };
-
