@@ -2,34 +2,36 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    // Drop a tabela existente se necessário
-    await queryInterface.dropTable('Users');
-
-    // Cria a tabela com todas as configurações atualizadas
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Gastos', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
+      descricao: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      email: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true
-        }
+      valor: {
+        type: Sequelize.DECIMAL(10, 2),
+        allowNull: false
       },
-      password: {
+      categoria: {
         type: Sequelize.STRING,
+        allowNull: false
+      },
+      data: {
+        type: Sequelize.DATE,
         allowNull: false,
-        validate: {
-          len: [6, 100]
+        defaultValue: Sequelize.NOW
+      },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Users',
+          key: 'id'
         }
       },
       createdAt: {
@@ -41,15 +43,9 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    // Adiciona índice para email
-    await queryInterface.addIndex('Users', ['email'], {
-      unique: true,
-      name: 'users_email_unique'
-    });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Gastos');
   }
-}; 
+};

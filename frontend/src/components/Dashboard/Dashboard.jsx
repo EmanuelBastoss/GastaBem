@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import Navbar from '../Navbar/Navbar';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,27 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    // Cores para o gráfico
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
+    // Função para agrupar despesas por categoria
+    const getDespesasPorCategoria = () => {
+        const grouped = despesas.reduce((acc, despesa) => {
+            const categoria = despesa.categoria;
+            if (!acc[categoria]) {
+                acc[categoria] = 0;
+            }
+            acc[categoria] += Number(despesa.valor);
+            return acc;
+        }, {});
+
+        // Converter para o formato que o Recharts espera
+        return Object.entries(grouped).map(([name, value]) => ({
+            name,
+            value: Number(value.toFixed(2))
+        }));
+    };
 
     useEffect(() => {
         carregarDados();
@@ -52,7 +74,7 @@ function Dashboard() {
                 <div className="dashboard-header">
                     <h1>Dashboard</h1>
                     <button onClick={handleAddGasto} className="add-button">
-                        Adicionar Gasto
+                        Novo Lançamento
                     </button>
                 </div>
 
@@ -68,16 +90,55 @@ function Dashboard() {
                         </button>
                     </div>
                 ) : (
-                    <div className="despesas-list">
-                        {despesas.map((despesa) => (
-                            <div key={despesa.id} className="despesa-item">
-                                <h3>{despesa.descricao}</h3>
-                                <p>R$ {Number(despesa.valor).toFixed(2)}</p>
-                                <p>{despesa.categoria}</p>
-                                <p>{new Date(despesa.data).toLocaleDateString()}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <>
+                        {/* Gráfico de Pizza */}
+                        <div className="chart-container">
+    <h2>Distribuição de Gastos por Categoria</h2>
+    <PieChart width={600} height={400}>
+        <Pie
+            data={getDespesasPorCategoria()}
+            cx="50%"
+            cy="50%"
+            labelLine={true} // Habilita a linha do label
+            outerRadius={130} // Reduz um pouco o raio para dar espaço aos labels
+            fill="#8884d8"
+            dataKey="value"
+            label={({ percent }) => { // Customiza o label
+                return `${(percent * 100).toFixed(0)}%`;
+            }}
+        >
+            {getDespesasPorCategoria().map((entry, index) => (
+                <Cell 
+                    key={`cell-${index}`} 
+                    fill={COLORS[index % COLORS.length]}
+                />
+            ))}
+        </Pie>
+        <Tooltip 
+            formatter={(value) => `R$ ${value.toFixed(2)}`}
+            contentStyle={{ backgroundColor: 'white', borderRadius: '4px' }}
+        />
+        <Legend 
+            layout="vertical" // Coloca a legenda na vertical
+            align="right" // Alinha à direita
+            verticalAlign="middle" // Alinha verticalmente ao meio
+            wrapperStyle={{ paddingLeft: '20px' }} // Adiciona espaço à esquerda da legenda
+        />
+    </PieChart>
+</div>
+
+                        {/* Lista de despesas existente */}
+                        <div className="despesas-list">
+                            {despesas.map((despesa) => (
+                                <div key={despesa.id} className="despesa-item">
+                                    <h3>{despesa.descricao}</h3>
+                                    <p>R$ {Number(despesa.valor).toFixed(2)}</p>
+                                    <p>{despesa.categoria}</p>
+                                    <p>{new Date(despesa.data).toLocaleDateString()}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 )}
             </div>
         </div>

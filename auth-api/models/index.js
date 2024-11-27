@@ -7,21 +7,28 @@ const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 
-// Carrega as variáveis de ambiente do .env
 require('dotenv').config();
 
-// Importa as configurações do config.json
-const config = require(__dirname + '/../config/config.json')[env];
+const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
-// Inicializa o Sequelize
 let sequelize = new Sequelize(config.database, config.username, config.password, config);
 
+const sharedModelsPath = path.join(__dirname, '../../shared/models');
 
-// Importa o modelo User do diretório compartilhado *APÓS* inicializar o Sequelize
-const User = require('../../shared/models/user')(sequelize, Sequelize.DataTypes);
-db.User = User;
-
+fs
+  .readdirSync(sharedModelsPath)
+  .filter(file => {
+    return (
+      file.indexOf('.') !== 0 &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
+  })
+  .forEach(file => {
+    const model = require(path.join(sharedModelsPath, file))(sequelize, Sequelize.DataTypes);
+    db[model.name] = model;
+  });
 
 fs
   .readdirSync(__dirname)
@@ -48,3 +55,6 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+console.log('Models carregados:', Object.keys(db));
+console.log('User model:', db.User ? 'Carregado com sucesso' : 'Não encontrado');

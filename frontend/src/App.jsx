@@ -3,6 +3,7 @@ import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import Despesas from './components/Despesas/Despesas';
+import Senha from './Senha/Senha';
 
 // Componente para proteger rotas
 const ProtectedRoute = ({ children }) => {
@@ -20,6 +21,7 @@ function App() {
                 {/* Rotas públicas */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/senha" element={<Senha />} />
 
                 {/* Rotas protegidas */}
                 <Route path="/" element={
@@ -44,6 +46,9 @@ function App() {
                         <Navigate to="/dashboard" replace />
                     </ProtectedRoute>
                 } />
+
+                {/* Rotas adicionais */}
+                <Route path="/forgot-password" element={<Senha />} />
             </Routes>
         </BrowserRouter>
     );

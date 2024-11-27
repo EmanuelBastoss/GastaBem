@@ -22,11 +22,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     userId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: false
     }
-  }, {
-    timestamps: true
   });
+  
+  Entrada.associate = function(models) {
+    Entrada.belongsTo(models.User, { 
+      foreignKey: 'userId',
+      as: 'user'
+    });
+  };
   
   return Entrada;
 };

@@ -16,37 +16,22 @@ body {
     align-items: center;
     background: white;
 }
-
-.container {
-    width: 70vw; 
-    height: 80vh;
-    display: flex;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-.form-image {
-    width: 50%; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.form-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
 .form {
-    width: 50%; 
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: #00a151;
+    background-color: #2196f3 !important;
     padding: 3rem;
     color: #ffffff;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 
@@ -81,6 +66,7 @@ body {
 .input-group {
     display:inline;
     flex-wrap:nowrap;
+    align-items: c;
     justify-content: space-between;
     padding: 1rem 0;
 }
@@ -129,7 +115,7 @@ box-shadow: 1px 1px 6px #ffffff1c;
 }
 
 .form-links a {
-    color: #ffffff; 
+    color: #ffffff !important; 
     text-decoration: underline;
 }
 
@@ -173,4 +159,44 @@ box-shadow: 1px 1px 6px #ffffff1c;
         padding-right: 5rem;
     }
 }
+
+/* Ajustes de responsividade */
+@media screen and (max-width: 768px) {
+    .form {
+        width: 90%;
+        padding: 20px;
+    }
+
+    .input-group {
+        padding: 0;
+    }
+
+    .input-box {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .form-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .input-box input {
+        padding: 10px;
+    }
+}
+
+/* Remove a cor de fundo do autopreenchimento */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: black !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+input:-webkit-autofill {
+    -webkit-text-fill-color: black !important;
+}
+
 /*login*/

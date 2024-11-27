@@ -147,3 +147,32 @@
         width: 100%;
     }
 }
+
+@media screen and (max-width: 768px) {
+    .content {
+        padding: 10px;
+    }
+
+    .lists-container {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .add-button {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .transaction-item {
+        padding: 10px;
+    }
+
+    .transaction-info h3 {
+        font-size: 1rem;
+    }
+}

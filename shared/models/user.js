@@ -1,43 +1,76 @@
+const { Model, DataTypes } = require('sequelize');
 const bcrypt = require('bcryptjs');
 
-module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+module.exports = (sequelize) => {
+  class User extends Model {
+    async checkPassword(password) {
+      try {
+        console.log("Verificando senha...");
+        console.log("Senha fornecida:", password);
+        console.log("Hash armazenado:", this.password);
+        
+        if (!password || !this.password) {
+          console.log("Senha ou hash ausente");
+          return false;
+        }
+        
+        const isValid = await bcrypt.compare(password, this.password);
+        console.log("Resultado da verificação:", isValid);
+        return isValid;
+      } catch (error) {
+        console.error("Erro ao verificar senha:", error);
+        console.error("Detalhes do erro:", error.message);
+        return false;
+      }
+    }
+  }
+
+  User.init({
     name: {
       type: DataTypes.STRING,
-      allowNull: false, // Nome é obrigatório
-      validate: {
-        notEmpty: true, // Nome não pode ser vazio
-        len: [3, 255] // Nome deve ter entre 3 e 255 caracteres
-      }
+      allowNull: false
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false, // Email é obrigatório
-      unique: true, // Email deve ser único
+      allowNull: false,
+      unique: true,
       validate: {
-        isEmail: true // Valida o formato do email
+        isEmail: true
       }
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false, // Senha é obrigatória
+      allowNull: false,
       validate: {
-        notEmpty: true, // Senha não pode ser vazia
-        len: [6, 255] // Senha deve ter entre 6 e 255 caracteres
+        len: [6, 100]
+      }
+    }
+  }, {
+    sequelize,
+    modelName: 'User',
+    defaultScope: {
+      attributes: { exclude: ['password'] }
+    },
+    scopes: {
+      withPassword: {
+        attributes: {}
+      }
+    },
+    hooks: {
+      beforeCreate: async (user) => {
+        if (user.password) {
+          console.log("Criptografando senha para novo usuário");
+          user.password = await bcrypt.hash(user.password, 10);
+        }
+      },
+      beforeUpdate: async (user) => {
+        if (user.changed('password')) {
+          console.log("Criptografando nova senha");
+          user.password = await bcrypt.hash(user.password, 10);
+        }
       }
     }
   });
-
-  User.beforeCreate(async (user) => {
-    // Criptografa a senha antes de criar o usuário
-    user.password = await bcrypt.hash(user.password, 10);
-  });
-
-  // Define a associação com o modelo Gasto
-  User.associate = (models) => {
-    User.hasMany(models.Gasto, { foreignKey: 'userId', as: 'gastos' });
-  };
-
 
   return User;
 };
