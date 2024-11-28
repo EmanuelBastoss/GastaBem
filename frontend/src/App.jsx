@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Despesas from './components/Despesas/Despesas';
 import Senha from './components/Senha/Senha.jsx';
 import Teste from './components/Teste/Teste.jsx';
+import Dashboard1 from './components/dashboard1/Dashboard1.jsx';
 
 
 
@@ -52,6 +53,8 @@ function App() {
 
                 {/* Rotas adicionais */}    
                 <Route path='/teste' element={<Teste />} />
+                <Route path='/dashboard1' element={<Dashboard1 />} />
+
             </Routes>
         </BrowserRouter>
     );
