@@ -3,7 +3,10 @@ import Login from './components/Login/Login';
 import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import Despesas from './components/Despesas/Despesas';
-import Senha from './Senha/Senha';
+import Senha from './components/Senha/Senha.jsx';
+import Teste from './components/Teste/Teste.jsx';
+
+
 
 // Componente para proteger rotas
 const ProtectedRoute = ({ children }) => {
@@ -47,8 +50,8 @@ function App() {
                     </ProtectedRoute>
                 } />
 
-                {/* Rotas adicionais */}
-                <Route path="/forgot-password" element={<Senha />} />
+                {/* Rotas adicionais */}    
+                <Route path='/teste' element={<Teste />} />
             </Routes>
         </BrowserRouter>
     );
