@@ -18,10 +18,10 @@ function Navbar() {
             <div className="navbar-menu">
                 <Link to="/dashboard" className="navbar-item">Dashboard</Link>
                 <Link to="/despesas" className="navbar-item">Despesas</Link>
-                <button onClick={handleLogout} className="navbar-item logout-button">
-                    Sair
-                </button>
             </div>
+            <button onClick={handleLogout} className="navbar-item logout-button">
+                Sair
+            </button>
         </nav>
     );
 }

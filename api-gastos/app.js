@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const gastosRouter = require('./routes/gastos');
 const entradasRouter = require('./routes/entradas');
+const lancamentosRouter = require('./routes/lancamentos');
 
 const app = express();
 
@@ -13,8 +14,9 @@ app.use(express.json());
 // Rotas
 app.use('/api/gastos', gastosRouter);
 app.use('/api/entradas', entradasRouter);
+app.use('/api/lancamentos', lancamentosRouter);
 
-// Verificação simples se o servidor está rodando
+// Verificação se o servidor está rodando
 app.get('/', (req, res) => {
     res.json({ message: 'API Gastos está rodando!' });
 });

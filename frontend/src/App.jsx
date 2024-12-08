@@ -5,8 +5,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Despesas from './components/Despesas/Despesas';
 import Senha from './components/Senha/Senha.jsx';
 import Teste from './components/Teste/Teste.jsx';
-import Dashboard1 from './components/dashboard1/Dashboard1.jsx';
-
+import Lista from './components/Lista/Lista.jsx'
 
 
 // Componente para proteger rotas
@@ -53,8 +52,7 @@ function App() {
 
                 {/* Rotas adicionais */}    
                 <Route path='/teste' element={<Teste />} />
-                <Route path='/dashboard1' element={<Dashboard1 />} />
-
+                <Route path='/lista' element={<Lista />} />
             </Routes>
         </BrowserRouter>
     );

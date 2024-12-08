@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 import ModalDespesa from '../Modal/ModalDespesa';
 import ModalEntrada from '../Modal/ModalEntrada';
+import Lista from '../Lista/Lista';
 import './Despesas.css';
 
 function Despesas() {
@@ -10,6 +11,8 @@ function Despesas() {
     const [entradas, setEntradas] = useState([]);
     const [modalDespesaAberto, setModalDespesaAberto] = useState(false);
     const [modalEntradaAberto, setModalEntradaAberto] = useState(false);
+    const [filtro, setFiltro] = useState('todos');
+    const [despesaEditando, setDespesaEditando] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,54 +22,63 @@ function Despesas() {
     const carregarDados = async () => {
         try {
             const token = localStorage.getItem('userToken');
+            if (!token) {
+                alert('Token não encontrado. Por favor, faça login novamente.');
+                return;
+            }
             
-            // Carregar despesas
-            const respDespesas = await fetch('http://localhost:5012/api/gastos', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            const dadosDespesas = await respDespesas.json();
-            setDespesas(dadosDespesas);
+            // Carregar despesas e entradas
+            const [respDespesas, respEntradas] = await Promise.all([
+                fetch('http://localhost:5012/api/gastos', { headers: { 'Authorization': `Bearer ${token}` } }),
+                fetch('http://localhost:5012/api/entradas', { headers: { 'Authorization': `Bearer ${token}` } })
+            ]);
 
-            // Carregar entradas
-            const respEntradas = await fetch('http://localhost:5012/api/entradas', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            if (!respDespesas.ok || !respEntradas.ok) {
+                throw new Error('Erro ao carregar dados');
+            }
+
+            const dadosDespesas = await respDespesas.json();
             const dadosEntradas = await respEntradas.json();
+            setDespesas(dadosDespesas);
             setEntradas(dadosEntradas);
         } catch (error) {
             console.error('Erro ao carregar dados:', error);
+            alert('Erro ao carregar dados: ' + error.message);
         }
     };
 
     const handleSalvarDespesa = async (novaDespesa) => {
         try {
             const token = localStorage.getItem('userToken');
-            console.log('Token:', token); // Para debug
-            console.log('Dados sendo enviados:', novaDespesa); // Para debug
-
-            const response = await fetch('http://localhost:5012/api/gastos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(novaDespesa)
-            });
+            const response = despesaEditando 
+                ? await fetch(`http://localhost:5012/api/gastos/${despesaEditando.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(novaDespesa)
+                })
+                : await fetch('http://localhost:5012/api/gastos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(novaDespesa)
+                });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                console.error('Erro ao salvar:', errorData); // Para debug
+                console.error('Erro ao salvar:', errorData);
                 throw new Error(errorData.message || 'Erro ao salvar despesa');
             }
 
             const data = await response.json();
-            console.log('Resposta do servidor:', data); // Para debug
+            console.log('Resposta do servidor:', data);
             
             setModalDespesaAberto(false);
+            setDespesaEditando(null);
             carregarDados();
         } catch (error) {
             console.error('Erro ao salvar despesa:', error);
@@ -77,23 +89,97 @@ function Despesas() {
     const handleSalvarEntrada = async (novaEntrada) => {
         try {
             const token = localStorage.getItem('userToken');
-            const response = await fetch('http://localhost:5012/api/entradas', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(novaEntrada)
-            });
+            const response = despesaEditando 
+                ? await fetch(`http://localhost:5012/api/entradas/${despesaEditando.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(novaEntrada)
+                })
+                : await fetch('http://localhost:5012/api/entradas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(novaEntrada)
+                });
 
-            if (response.ok) {
-                setModalEntradaAberto(false);
-                carregarDados();
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Erro ao salvar:', errorData);
+                throw new Error(errorData.message || 'Erro ao salvar entrada');
             }
+
+            const data = await response.json();
+            console.log('Resposta do servidor:', data);
+            
+            setModalEntradaAberto(false);
+            setDespesaEditando(null);
+            carregarDados();
         } catch (error) {
             console.error('Erro ao salvar entrada:', error);
+            alert('Erro ao salvar entrada: ' + error.message);
         }
     };
+
+    const handleEditDespesa = (despesa) => {
+        setDespesaEditando(despesa);
+        setModalDespesaAberto(true);
+    };
+
+    const handleEditEntrada = (entrada) => {
+        setDespesaEditando(entrada);
+        setModalEntradaAberto(true);
+    };
+
+    const verificarDespesaExistente = async (id) => {
+        const token = localStorage.getItem('userToken');
+        const response = await fetch(`http://localhost:5012/api/gastos/${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.ok; // Retorna true se a despesa existir
+    };
+
+    const handleDelete = async (id, tipo) => {
+        const token = localStorage.getItem('userToken');
+        const url = tipo === 'despesa' ? `http://localhost:5012/api/gastos/${id}` : `http://localhost:5012/api/entradas/${id}`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error('Erro ao excluir: ' + errorText);
+            }
+
+            carregarDados(); // Recarrega os dados após a exclusão
+        } catch (error) {
+            console.error('Erro ao excluir:', error);
+            alert('Erro ao excluir: ' + error.message);
+        }
+    };
+
+    // Combina despesas e entradas em uma única lista e ordena por data
+    const listaCompleta = [
+        ...despesas.map(d => ({ ...d, tipo: 'despesa' })),
+        ...entradas.map(e => ({ ...e, tipo: 'entrada' }))
+    ].sort((a, b) => new Date(a.data) - new Date(b.data));
+
+    // Filtra a lista com base no filtro selecionado
+    const listaFiltrada = listaCompleta.filter(item => {
+        if (filtro === 'despesas') return item.tipo === 'despesa';
+        if (filtro === 'entradas') return item.tipo === 'entrada';
+        return true; // Retorna todos se o filtro for 'todos'
+    });
 
     return (
         <div className="despesas-container">
@@ -115,39 +201,18 @@ function Despesas() {
                     </button>
                 </div>
 
-                <div className="lists-container">
-                    <div className="list-section">
-                        <h2>Despesas</h2>
-                        <div className="transactions-list">
-                            {despesas.map((despesa) => (
-                                <div key={despesa.id} className="transaction-item despesa">
-                                    <div className="transaction-info">
-                                        <h3>{despesa.descricao}</h3>
-                                        <p>R$ {Number(despesa.valor).toFixed(2)}</p>
-                                        <p>{despesa.categoria}</p>
-                                        <p>{new Date(despesa.data).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="list-section">
-                        <h2>Entradas</h2>
-                        <div className="transactions-list">
-                            {entradas.map((entrada) => (
-                                <div key={entrada.id} className="transaction-item entrada">
-                                    <div className="transaction-info">
-                                        <h3>{entrada.descricao}</h3>
-                                        <p>R$ {Number(entrada.valor).toFixed(2)}</p>
-                                        <p>{entrada.categoria}</p>
-                                        <p>{new Date(entrada.data).toLocaleDateString()}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                {/* Filtros */}
+                <div className="filtro-container">
+                    <button onClick={() => setFiltro('todos')} className="filtro-button">Todos</button>
+                    <button onClick={() => setFiltro('despesas')} className="filtro-button">Despesas</button>
+                    <button onClick={() => setFiltro('entradas')} className="filtro-button">Entradas</button>
                 </div>
+
+                <Lista 
+                    rows={listaFiltrada} 
+                    onEdit={handleEditDespesa} 
+                    onDelete={handleDelete} 
+                />
             </div>
 
             <ModalDespesa 

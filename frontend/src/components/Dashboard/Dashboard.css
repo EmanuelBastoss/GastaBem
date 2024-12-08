@@ -214,7 +214,7 @@ h2 {
 }
 
 .add-button {
-    background-color: #2196f3;
+    background-color: #05070a;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -225,7 +225,7 @@ h2 {
 }
 
 .add-button:hover {
-    background-color: #1976d2;
+    background-color: #4e555f;
 }
 
 .no-data {

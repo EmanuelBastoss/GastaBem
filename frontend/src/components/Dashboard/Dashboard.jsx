@@ -5,63 +5,63 @@ import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
-    const [despesas, setDespesas] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const [despesas, setDespesas] = useState([]); // Agora 'despesas' armazenará todos os lançamentos
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-    // Cores para o gráfico
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+  // Cores para o gráfico
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-    // Função para agrupar despesas por categoria
-    const getDespesasPorCategoria = () => {
-        const grouped = despesas.reduce((acc, despesa) => {
-            const categoria = despesa.categoria;
-            if (!acc[categoria]) {
-                acc[categoria] = 0;
-            }
-            acc[categoria] += Number(despesa.valor);
-            return acc;
-        }, {});
+  // Função para agrupar despesas por categoria (adaptada para todos os lançamentos)
+  const getDespesasPorCategoria = () => {
+    const grouped = despesas.reduce((acc, lancamento) => {
+      const categoria = lancamento.categoria;
+      if (!acc[categoria]) {
+        acc[categoria] = 0;
+      }
+      acc[categoria] += Number(lancamento.valor); 
+      return acc;
+    }, {});
 
-        // Converter para o formato que o Recharts espera
-        return Object.entries(grouped).map(([name, value]) => ({
-            name,
-            value: Number(value.toFixed(2))
-        }));
-    };
+    return Object.entries(grouped).map(([name, value]) => ({
+      name,
+      value: Number(value.toFixed(2))
+    }));
+  };
 
-    useEffect(() => {
-        carregarDados();
-    }, []);
+  useEffect(() => {
+    carregarDados();
+  }, []);
 
-    const carregarDados = async () => {
-        try {
-            setLoading(true);
-            const token = localStorage.getItem('userToken');
-            console.log('Token:', token);
+  const carregarDados = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('userToken');
+      console.log('Token:', token);
 
-            const response = await fetch('http://localhost:5012/api/gastos', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}: ${await response.text()}`);
-            }
-
-            const data = await response.json();
-            console.log('Dados recebidos:', data);
-            setDespesas(data);
-            setError(null);
-        } catch (error) {
-            console.error('Erro ao carregar dados:', error);
-            setError(error.message);
-        } finally {
-            setLoading(false);
+      // Busca os dados da nova rota /api/lancamentos
+      const response = await fetch('http://localhost:5012/api/lancamentos', { 
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-    };
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ${response.status}: ${await response.text()}`);
+      }
+
+      const data = await response.json();
+      console.log('Dados recebidos:', data);
+      setDespesas(data); // Armazena todos os lançamentos em 'despesas'
+      setError(null);
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const handleAddGasto = () => {
         navigate('/despesas'); // Navega para a página de despesas
@@ -125,6 +125,7 @@ function Dashboard() {
             wrapperStyle={{ paddingLeft: '20px' }} // Adiciona espaço à esquerda da legenda
         />
     </PieChart>
+    
 </div>
 
                         {/* Lista de despesas existente */}
