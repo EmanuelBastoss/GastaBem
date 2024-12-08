@@ -3,15 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "auth-api",
-    "api-gastos",
-    "frontend"
+    "frontend",
+    "api-financeira"
   ],
   "scripts": {
-    "start:auth-api": "npm start --workspace=auth-api",
-    "start:api-gastos": "npm start --workspace=api-gastos",
+    "start:api": "npm start --workspace=api-financeira",
     "start:frontend": "npm start --workspace=frontend"
   },
+  
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "sequelize-cli": "^6.6.2"
@@ -38,3 +37,4 @@
   "author": "",
   "license": "ISC"
 }
+

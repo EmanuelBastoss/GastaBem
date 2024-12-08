@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { login } from '../../services/auth';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -91,22 +91,15 @@ export default function SignIn({ disableCustomTheme }) {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5001/login', {
-        email: email.toLowerCase(),
-        password: password
-      });
-
-      if (response.status === 200) {
-        localStorage.setItem('userToken', response.data.token);
+      const response = await login(email, password);
+      if (response.token) {
+        localStorage.setItem('userToken', response.token);
+        localStorage.setItem('userName', response.userName);
         navigate('/dashboard');
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        setError('Email ou senha incorretos!');
-      } else {
-        setError('Erro ao conectar com o servidor');
-        console.error('Erro:', error);
-      }
+      console.error('Erro ao fazer login:', error);
+      setError(error.message || 'Email ou senha incorretos!');
     } finally {
       setLoading(false);
     }

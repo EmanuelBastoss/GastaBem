@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { register } from '../../services/auth';
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -128,14 +128,12 @@ export default function SignUp(props) {
         setNameErrorMessage('');
     }
 
-    // Envio para o backend
     try {
-        const response = await axios.post('http://localhost:5001/register', formData);
-        console.log('Resposta do servidor:', response.data);
+        await register(formData.name, formData.email, formData.password);
         navigate('/login');
     } catch (error) {
         console.error('Erro ao criar conta:', error);
-        setErro(error.response?.data?.message || 'Erro ao criar conta.');
+        setErro(error.message || 'Erro ao criar conta.');
     } finally {
         setLoading(false);
     }

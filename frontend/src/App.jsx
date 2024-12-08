@@ -4,7 +4,6 @@ import Register from './components/Register/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import Despesas from './components/Despesas/Despesas';
 import Senha from './components/Senha/Senha.jsx';
-import Teste from './components/Teste/Teste.jsx';
 import Lista from './components/Lista/Lista.jsx'
 
 
@@ -51,7 +50,6 @@ function App() {
                 } />
 
                 {/* Rotas adicionais */}    
-                <Route path='/teste' element={<Teste />} />
                 <Route path='/lista' element={<Lista />} />
             </Routes>
         </BrowserRouter>

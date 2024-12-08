@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
-import Navbar from '../Navbar/Navbar';
-import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../config/api';
+import Navbar from '../Navbar/Navbar';
+import Lista from '../Lista/Lista';
+import { PieChart, Pie, Cell, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import './Dashboard.css';
 
 function Dashboard() {
   const [despesas, setDespesas] = useState([]); // Agora 'despesas' armazenará todos os lançamentos
@@ -15,7 +17,10 @@ function Dashboard() {
 
   // Função para agrupar despesas por categoria (adaptada para todos os lançamentos)
   const getDespesasPorCategoria = () => {
-    const grouped = despesas.reduce((acc, lancamento) => {
+    // Filtra apenas as despesas (saídas)
+    const despesasApenas = despesas.filter(lancamento => lancamento.tipo === 'saida');
+    
+    const grouped = despesasApenas.reduce((acc, lancamento) => {
       const categoria = lancamento.categoria;
       if (!acc[categoria]) {
         acc[categoria] = 0;
@@ -30,6 +35,43 @@ function Dashboard() {
     }));
   };
 
+  // Função para preparar dados do LineChart
+  const getLineChartData = () => {
+    const dadosPorData = despesas.reduce((acc, lancamento) => {
+      const data = new Date(lancamento.data).toLocaleDateString();
+      if (!acc[data]) {
+        acc[data] = { name: data, entradas: 0, saidas: 0 };
+      }
+      if (lancamento.tipo === 'entrada') {
+        acc[data].entradas += Number(lancamento.valor);
+      } else {
+        acc[data].saidas += Number(lancamento.valor);
+      }
+      return acc;
+    }, {});
+
+    return Object.values(dadosPorData).sort((a, b) => 
+      new Date(a.name) - new Date(b.name)
+    );
+  };
+
+  const calcularTotais = () => {
+    const totais = despesas.reduce((acc, lancamento) => {
+      const valor = Number(lancamento.valor);
+      if (lancamento.tipo === 'entrada') {
+        acc.totalEntradas += valor;
+      } else {
+        acc.totalSaidas += valor;
+      }
+      return acc;
+    }, { totalEntradas: 0, totalSaidas: 0 });
+
+    return {
+      ...totais,
+      saldo: totais.totalEntradas - totais.totalSaidas
+    };
+  };
+
   useEffect(() => {
     carregarDados();
   }, []);
@@ -38,10 +80,8 @@ function Dashboard() {
     try {
       setLoading(true);
       const token = localStorage.getItem('userToken');
-      console.log('Token:', token);
-
-      // Busca os dados da nova rota /api/lancamentos
-      const response = await fetch('http://localhost:5012/api/lancamentos', { 
+      
+      const response = await fetch(`${API_URL}/lancamentos`, { 
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -52,8 +92,7 @@ function Dashboard() {
       }
 
       const data = await response.json();
-      console.log('Dados recebidos:', data);
-      setDespesas(data); // Armazena todos os lançamentos em 'despesas'
+      setDespesas(data);
       setError(null);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
@@ -84,60 +123,91 @@ function Dashboard() {
                     <div className="error">Erro ao carregar dados: {error}</div>
                 ) : despesas.length === 0 ? (
                     <div className="no-data">
-                        <p>Nenhuma despesa encontrada.</p>
+                        <p>Nenhum lançamento encontrado.</p>
                         <button onClick={handleAddGasto} className="add-button">
-                            Adicionar Primeira Despesa
+                            Adicionar Primeiro Lançamento
                         </button>
                     </div>
                 ) : (
                     <>
-                        {/* Gráfico de Pizza */}
-                        <div className="chart-container">
-    <h2>Distribuição de Gastos por Categoria</h2>
-    <PieChart width={600} height={400}>
-        <Pie
-            data={getDespesasPorCategoria()}
-            cx="50%"
-            cy="50%"
-            labelLine={true} // Habilita a linha do label
-            outerRadius={130} // Reduz um pouco o raio para dar espaço aos labels
-            fill="#8884d8"
-            dataKey="value"
-            label={({ percent }) => { // Customiza o label
-                return `${(percent * 100).toFixed(0)}%`;
-            }}
-        >
-            {getDespesasPorCategoria().map((entry, index) => (
-                <Cell 
-                    key={`cell-${index}`} 
-                    fill={COLORS[index % COLORS.length]}
-                />
-            ))}
-        </Pie>
-        <Tooltip 
-            formatter={(value) => `R$ ${value.toFixed(2)}`}
-            contentStyle={{ backgroundColor: 'white', borderRadius: '4px' }}
-        />
-        <Legend 
-            layout="vertical" // Coloca a legenda na vertical
-            align="right" // Alinha à direita
-            verticalAlign="middle" // Alinha verticalmente ao meio
-            wrapperStyle={{ paddingLeft: '20px' }} // Adiciona espaço à esquerda da legenda
-        />
-    </PieChart>
-    
-</div>
+                        <div className="resumo-container">
+                            <div className={`resumo-item ${calcularTotais().saldo >= 0 ? 'positivo' : 'negativo'}`}>
+                                <h3>Saldo</h3>
+                                <p>R$ {calcularTotais().saldo.toFixed(2)}</p>
+                            </div>
+                            <div className="resumo-item entrada">
+                                <h3>Entradas</h3>
+                                <p>R$ {calcularTotais().totalEntradas.toFixed(2)}</p>
+                            </div>
+                            <div className="resumo-item saida">
+                                <h3>Saídas</h3>
+                                <p>R$ {calcularTotais().totalSaidas.toFixed(2)}</p>
+                            </div>
+                        </div>
 
-                        {/* Lista de despesas existente */}
-                        <div className="despesas-list">
-                            {despesas.map((despesa) => (
-                                <div key={despesa.id} className="despesa-item">
-                                    <h3>{despesa.descricao}</h3>
-                                    <p>R$ {Number(despesa.valor).toFixed(2)}</p>
-                                    <p>{despesa.categoria}</p>
-                                    <p>{new Date(despesa.data).toLocaleDateString()}</p>
-                                </div>
-                            ))}
+                        <div className="charts-container">
+                            {/* Gráfico de Linha */}
+                            <div className="chart-container">
+                                <h2>Fluxo de Caixa</h2>
+                                <LineChart width={600} height={300} data={getLineChartData()}
+                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="name" />
+                                    <YAxis />
+                                    <Tooltip formatter={(value) => `R$ ${value.toFixed(2)}`} />
+                                    <Legend />
+                                    <Line type="monotone" dataKey="entradas" stroke="#00C49F" />
+                                    <Line type="monotone" dataKey="saidas" stroke="#FF8042" />
+                                </LineChart>
+                            </div>
+
+                            {/* Gráfico de Pizza existente */}
+                            <div className="chart-container">
+                                <h2>Distribuição de Despesas por Categoria</h2>
+                                <PieChart width={500} height={300}>
+                                    <Pie
+                                        data={getDespesasPorCategoria()}
+                                        cx="50%"
+                                        cy="50%"
+                                        labelLine={false}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        dataKey="value"
+                                        label={false}
+                                    >
+                                        {getDespesasPorCategoria().map((entry, index) => (
+                                            <Cell 
+                                                key={`cell-${index}`} 
+                                                fill={COLORS[index % COLORS.length]}
+                                            />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip 
+                                        formatter={(value) => `R$ ${value.toFixed(2)}`}
+                                        contentStyle={{ backgroundColor: 'white', borderRadius: '4px' }}
+                                    />
+                                    <Legend 
+                                        layout="vertical"
+                                        align="right"
+                                        verticalAlign="middle"
+                                        formatter={(value, entry, index) => {
+                                            const total = getDespesasPorCategoria().reduce((sum, item) => sum + item.value, 0);
+                                            const percent = ((entry.payload.value / total) * 100).toFixed(0);
+                                            return `${value} (${percent}%)`;
+                                        }}
+                                        wrapperStyle={{ 
+                                            paddingLeft: '20px',
+                                            fontSize: '12px'
+                                        }}
+                                    />
+                                </PieChart>
+                            </div>
+                        </div>
+
+                        {/* Lista de lançamentos */}
+                        <div className="lista-container">
+                            <h2>Histórico de Lançamentos</h2>
+                            <Lista rows={despesas} />
                         </div>
                     </>
                 )}

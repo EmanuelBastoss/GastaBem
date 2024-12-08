@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { resetPassword } from '../../services/auth';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -78,19 +78,13 @@ function Senha() {
     setMessage('');
 
     try {
-      const response = await axios.post('http://localhost:5001/reset-password', {
-        email: email.toLowerCase(),
-        newPassword: novaSenha
-      });
-
-      if (response.status === 200) {
-        setMessage('Senha alterada com sucesso!');
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
-      }
+      await resetPassword(email, novaSenha);
+      setMessage('Senha alterada com sucesso!');
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
+      if (error.message === 'Usuário não encontrado') {
         setError('Email não encontrado no sistema.');
       } else {
         setError('Erro ao alterar a senha. Tente novamente mais tarde.');

@@ -1,19 +1,23 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000' // URL da sua API
+    baseURL: 'http://localhost:5000/api'
 });
 
-// Adiciona um interceptor para incluir o token JWT no header Authorization
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem('userToken'); // Nome correto do token no localStorage
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+    (config) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.token) {
+            config.headers.Authorization = `Bearer ${user.token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
     }
-    return config;
-}, error => {
-    return Promise.reject(error);
-});
+);
 
 export default api;
+
+export const API_URL = 'http://localhost:5000/api';
 

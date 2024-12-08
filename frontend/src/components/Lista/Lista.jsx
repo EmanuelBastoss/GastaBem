@@ -28,6 +28,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function CustomizedTables({ rows, onEdit, onDelete }) {
+  const showActions = onEdit || onDelete;
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
@@ -37,7 +39,7 @@ export default function CustomizedTables({ rows, onEdit, onDelete }) {
             <StyledTableCell align="right">Valor</StyledTableCell>
             <StyledTableCell align="right">Categoria</StyledTableCell>
             <StyledTableCell align="right">Data</StyledTableCell>
-            <StyledTableCell align="right">Ações</StyledTableCell>
+            {showActions && <StyledTableCell align="right">Ações</StyledTableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -51,10 +53,12 @@ export default function CustomizedTables({ rows, onEdit, onDelete }) {
               </StyledTableCell>
               <StyledTableCell align="right">{row.categoria}</StyledTableCell>
               <StyledTableCell align="right">{new Date(row.data).toLocaleDateString()}</StyledTableCell>
-              <StyledTableCell align="right">
-                <button onClick={() => onEdit(row)}>Editar</button>
-                <button onClick={() => onDelete(row.id)}>Excluir</button>
-              </StyledTableCell>
+              {showActions && (
+                <StyledTableCell align="right">
+                  {onEdit && <button onClick={() => onEdit(row)}>Editar</button>}
+                  {onDelete && <button onClick={() => onDelete(row.id)}>Excluir</button>}
+                </StyledTableCell>
+              )}
             </StyledTableRow>
           ))}
         </TableBody>
