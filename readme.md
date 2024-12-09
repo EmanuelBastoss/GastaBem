@@ -72,9 +72,14 @@ Ou inicie manualmente cada parte:
      npm start
      
 Acessando a Aplicação
+
 Frontend: http://localhost:5173
+
 API: http://localhost:5000
-Documentação Swagger: http://localhost:5000/api-docs
+
+
+# Documentação Swagger: http://localhost:5000/api-docs
+
 Documentação da API
 A documentação completa da API está disponível através do Swagger UI. Principais endpoints:
 
