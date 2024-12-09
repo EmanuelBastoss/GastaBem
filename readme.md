@@ -59,9 +59,9 @@ JWT_SECRET=sua_chave_secreta
 
 -` cd api-financeira `
 
--` db:create gastabem_db `
+-` npx sequelize-cli db:create gastabem_db `
 
--` sequelize-cli db:migrate `
+-` npx sequelize-cli db:migrate `
 
 
 ## Execução do Projeto
