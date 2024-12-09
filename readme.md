@@ -20,8 +20,9 @@ Preparação do Ambiente
    cd C:\laragon\www
 
    # Clone o repositório
-   git clone https://github.com/EmanuelBastoss/GastaBem.git
-   cd gastabem
+   -git clone https://github.com/EmanuelBastoss/GastaBem.git
+   
+   -cd gastabem
 
    # Instale as dependências
    npm install
