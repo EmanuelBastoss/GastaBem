@@ -2,6 +2,76 @@ const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         name:
+ *           type: string
+ *         email:
+ *           type: string
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   responses:
+ *     UnauthorizedError:
+ *       description: Token não fornecido ou inválido
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ *                 example: Acesso negado. Token não fornecido ou inválido.
+ */
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Registra um novo usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "João Silva"
+ *               email:
+ *                 type: string
+ *                 example: "usuario@exemplo.com"
+ *               password:
+ *                 type: string
+ *                 example: "senha123"
+ *     responses:
+ *       201:
+ *         description: Usuário criado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ */
 exports.register = async (req, res) => {
     const { name, email, password } = req.body;
     
@@ -35,6 +105,49 @@ exports.register = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Realiza login do usuário
+ *     description: |
+ *       Para testar as rotas protegidas:
+ *       1. Execute esta rota de login com email e senha
+ *       2. Copie o token da resposta
+ *       3. Clique no botão 'Authorize' no topo da página
+ *       4. Cole o token no formato: Bearer seu-token-aqui
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "usuario@exemplo.com"
+ *               password:
+ *                 type: string
+ *                 example: "senha123"
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                 userName:
+ *                   type: string
+ *                   example: "João Silva"
+ */
 exports.login = async (req, res) => {
     const { email, password } = req.body;
     
@@ -59,6 +172,32 @@ exports.login = async (req, res) => {
     }
 };
 
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Altera a senha do usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Senha alterada com sucesso
+ *       404:
+ *         description: Usuário não encontrado
+ */
 exports.resetPassword = async (req, res) => {
     const { email, newPassword } = req.body;
 
