@@ -37,7 +37,7 @@ Antes de começar, certifique-se de ter o seguinte software instalado:
 
    - Crie um arquivo `.env` na raiz de cada API (`auth-api` e `api-gastos`) com o seguinte conteúdo:
 
-     ```
+     
   DB_USER=root
 DB_PASSWORD=
 DB_NAME=gastabem_db
@@ -48,7 +48,7 @@ DB_PORT=3306
 DB_DIALECT=mysql
 JWT_SECRET=sua_chave_secreta
 
-     ```
+   
 
 ## criação dos bancos de dados e instalação de dependencias
 - **criação dos bancos de dados e instalação de dependencias**
@@ -57,14 +57,18 @@ JWT_SECRET=sua_chave_secreta
 
 **comandos na pasta Raiz para criar os bancos**
 
--``cd api-financeira``
--``db:create gastabem_db``
--``sequelize-cli db:migrate``
+-` cd api-financeira `
+
+-` db:create gastabem_db `
+
+-` sequelize-cli db:migrate `
 
 
 ## Execução do Projeto
 3. **Execução do Projeto**
 
 - execute o ``start-all.bat`` para iniciar o frontend e as apis em novas janelas de terminal.
+
+- teste com o swagger em http://localhost:5000/api-docs/#/
 
 
