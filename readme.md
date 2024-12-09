@@ -1,74 +1,81 @@
-# GastaBem Web
+GastaBem Web
+Introdução
+GastaBem é uma aplicação web para gerenciamento financeiro pessoal, desenvolvida com React no frontend e Node.js/Express no backend. O projeto permite aos usuários controlar suas finanças através de um sistema intuitivo de lançamentos de entrada e saída.
 
-## Introdução
+Tecnologias Utilizadas
+Frontend: React, Bootstrap, Chart.js
+Backend: Node.js, Express, Sequelize
+Banco de Dados: MySQL
+Documentação: Swagger
+Autenticação: JWT
 
-GastaBem é um projeto web que ajuda os usuários a gerenciar seus gastos. O projeto é composto por uma api (api-financeira) e um frontend em React.
+Pré-requisitos
+Laragon (inclui MySQL)
+Node.js (versão 14 ou superior)
+NPM (gerenciador de pacotes do Node.js)
+Instalação
+Preparação do Ambiente
+   # Inicie o Laragon e seus serviços (MySQL)
+   # Abra o terminal e navegue até a pasta www do Laragon
+   cd C:\laragon\www
 
-## Pré-requisitos
+   # Clone o repositório
+   git clone https://github.com/EmanuelBastoss/GastaBem.git
+   cd gastabem
 
-Antes de começar, certifique-se de ter o seguinte software instalado:
+   # Instale as dependências
+   npm install
+   
+Configuração do Ambiente
+Crie um arquivo .env na pasta api-financeira com as seguintes configurações:
 
-- **Laragon:** Para gerenciar o ambiente de desenvolvimento local. https://laragon.org/download/
-
-## Configuração do Ambiente
-
-1. **Inicie o Laragon:**
-   - Abra o Laragon e inicie o servidor Apache e MySQL.
-
-
-
-## Instalação
-
-1.**inicie o laragon antes dessa parte**
-2.**inicie o laragon antes dessa parte**
-
-1. **Clone o Repositório:**
-
-   - **abra o cmd e use os comandos:**
-   - ` cd C:\laragon\www `
-   - ` git clone https://github.com/EmanuelBastoss/GastaBem.git `
-   - ` cd gastabem `
-   - ` npm install `
-
-2. **Configurar Variáveis de Ambiente:**
-
-**Ajuste as configurações no arquivo .env conforme necessário para seu ambiente.**
-
-
-   - Crie um arquivo `.env` na raiz de cada API (`auth-api` e `api-gastos`) com o seguinte conteúdo:
-
-     
-  DB_USER=root
-DB_PASSWORD=
-DB_NAME=gastabem_db
-DB_HOST=127.0.0.1
-PORT=5000
-DB_HOST=localhost
-DB_PORT=3306
-DB_DIALECT=mysql
-JWT_SECRET=sua_chave_secreta
+   DB_USER=root
+   DB_PASSWORD=
+   DB_NAME=gastabem_db
+   DB_HOST=localhost
+   PORT=5000
+   DB_PORT=3306
+   DB_DIALECT=mysql
+   JWT_SECRET=sua_chave_secreta
 
    
+Configuração do Banco de Dados
 
-## criação dos bancos de dados e instalação de dependencias
-- **criação dos bancos de dados e instalação de dependencias**
+   # Navegue até a pasta da API
+   cd api-financeira
 
+   # Crie o banco de dados
+   npx sequelize-cli db:create
 
+   # Execute as migrações
+   npx sequelize-cli db:migrate
 
-**comandos na pasta Raiz para criar os bancos**
+   
+Execução do Projeto
+Iniciar a Aplicação
+Execute o arquivo start-all.bat na raiz do projeto
+Ou inicie manualmente cada parte:
+     # Terminal 1 - API
+     cd api-financeira
+     npm start
+     # Terminal 2 - Frontend
+     cd frontend
+     npm start
+     
+Acessando a Aplicação
+Frontend: http://localhost:5173
+API: http://localhost:5000
+Documentação Swagger: http://localhost:5000/api-docs
+Documentação da API
+A documentação completa da API está disponível através do Swagger UI. Principais endpoints:
 
--` cd api-financeira `
+Autenticação
+POST /api/auth/register - Registro de usuário
+POST /api/auth/login - Login
+POST /api/auth/reset-password - Redefinição de senha
 
--` npx sequelize-cli db:create gastabem_db `
-
--` npx sequelize-cli db:migrate `
-
-
-## Execução do Projeto
-3. **Execução do Projeto**
-
-- execute o ``start-all.bat`` para iniciar o frontend e as apis em novas janelas de terminal.
-
-- teste com o swagger em http://localhost:5000/api-docs/#/
-
-
+Lançamentos
+GET /api/lancamentos - Lista todos os lançamentos
+POST /api/lancamentos - Cria novo lançamento
+PUT /api/lancamentos/:id - Atualiza lançamento
+DELETE /api/lancamentos/:id - Remove lançamento
