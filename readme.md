@@ -30,14 +30,14 @@ Preparação do Ambiente
 Configuração do Ambiente
 Crie um arquivo .env na pasta api-financeira com as seguintes configurações:
 
-   DB_USER=root
-   DB_PASSWORD=
-   DB_NAME=gastabem_db
-   DB_HOST=localhost
-   PORT=5000
-   DB_PORT=3306
-   DB_DIALECT=mysql
-   JWT_SECRET=sua_chave_secreta
+   -DB_USER=root
+   -DB_PASSWORD=
+   -DB_NAME=gastabem_db
+   -DB_HOST=localhost
+   -PORT=5000
+   -DB_PORT=3306
+   -DB_DIALECT=mysql
+   -JWT_SECRET=sua_chave_secreta
 
    
 Configuração do Banco de Dados
